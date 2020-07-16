@@ -67,12 +67,12 @@ var Chat = (function () {
         return msg;
     }
 
-    var addResponse = function (isRobot, m, contentFn = "", cssClass = "") {
+    var addResponse = function (isRobot, m, contentFn = "", style = "") {
         waiting = false;
 
         var msg = addReferences(m.toString());
 
-        chat.append('<div class="chat-response ' + (isRobot ? "robot" : "user") + ' '+(cssClass != "" ? cssClass : '')+'"><p>' + msg + '</p><div class="add-content"></div></div>');
+        chat.append('<div class="chat-response ' + (isRobot ? "robot" : "user") + '" style="'+(style != "" ? style : '')+'"><p>' + msg + '</p><div class="add-content"></div></div>');
         if (contentFn != "") {
             renderAdditionalContent(contentFn, $('.chat-response:last .add-content')[0]);
         }
@@ -134,7 +134,7 @@ var Chat = (function () {
             return;
         }
 
-        addResponse(true, curTag["chat-msg"], curTag.content || "", curTag.cssClass || "");
+        addResponse(true, curTag["chat-msg"], curTag.content || "", curTag.style || "");
 
         if (curTag.tag && curTag.tag != "text" && curTag.tag != "custom") {
             addOptions(curTag.children);
@@ -233,6 +233,10 @@ var Chat = (function () {
         }
 
         data[curTag.name] = selected;
+		console.log("-> "+curTag.name+":"+selected);
+		
+		Qualtrics.SurveyEngine.setEmbeddedData(curTag.name, selected);
+		
         addResponse(false, friendlySelected);
         textResponse.val(null);
         removeOptions();
