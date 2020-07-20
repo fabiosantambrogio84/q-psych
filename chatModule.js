@@ -125,7 +125,7 @@ var Chat = (function () {
 					}
 					
 					// save the clicked star value	
-					console.log("-> "name+':'+id);
+					console.log("-> "+name+':'+id);
 					
 					Qualtrics.SurveyEngine.setEmbeddedData(name, id);
 					
