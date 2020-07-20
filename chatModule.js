@@ -49,6 +49,20 @@ var Chat = (function () {
         nextTag();
     };
 
+	/*
+	var setRating = function (id){
+		$('#i-1').removeClass('checked').addClass('unchecked');
+		$('#i-2').removeClass('checked').addClass('unchecked');
+		$('#i-3').removeClass('checked').addClass('unchecked');
+		$('#i-4').removeClass('checked').addClass('unchecked');
+		$('#i-5').removeClass('checked').addClass('unchecked');
+		
+		for (var i = 1; i <= id; i++) {
+			$('#i-'+i).removeClass('unchecked').addClass('checked');
+		}
+	};
+	*/
+
     var addReferences = function (m) {
         var splitMsg = m.split('{{');
         var msg = splitMsg[0];
@@ -65,14 +79,60 @@ var Chat = (function () {
         }
 
         return msg;
-    }
+    };
 
-    var addResponse = function (isRobot, m, contentFn = "", style = "") {
+    var addResponse = function (isRobot, m, contentFn = "", style = "", type = "", name = "") {
         waiting = false;
 
         var msg = addReferences(m.toString());
 
-        chat.append('<div class="chat-response ' + (isRobot ? "robot" : "user") + '" style="'+(style != "" ? style : '')+'"><p>' + msg + '</p><div class="add-content"></div></div>');
+		if(type != "rating"){
+			chat.append('<div class="chat-response ' + (isRobot ? "robot" : "user") + '" style="'+(style != "" ? style : "")+'"><p>' + msg + '</p><div class="add-content"></div></div>');
+	
+		} else {
+			
+			chat.append(`<div class="chat-response ` + (isRobot ? "robot" : "user") + `'" style="`+(style != "" ? style : "")+`"><div style="text-align: center;">
+				<p>`+msg+`</p>
+				<div class="main" id="`+name+`">
+				   <a id="1" class="rating" data-name="`+name+`"><i class="fa fa-star unchecked" id="`+name+`-i-1"></i></a>
+				   <a id="2" class="rating" data-name="`+name+`"><i class="fa fa-star unchecked" id="`+name+`-i-2"></i></a>
+				   <a id="3" class="rating" data-name="`+name+`"><i class="fa fa-star unchecked" id="`+name+`-i-3"></i></a>
+				   <a id="4" class="rating" data-name="`+name+`"><i class="fa fa-star unchecked" id="`+name+`-i-4"></i></a>
+				   <a id="5" class="rating" data-name="`+name+`"><i class="fa fa-star unchecked" id="`+name+`-i-5"></i></a>
+				</div>
+			</div>`);
+			
+			
+			//$('.rating').on('click',setRating($(this).attr('id')));
+			$('.rating').on('click', function () {
+				var id = $(this).attr('id')
+				var name = $(this).attr('data-name');
+				var clicked = $(this).attr('data-clicked');
+								
+				if(clicked != 1){
+					$('#'+name+'-i-1').removeClass('checked').addClass('unchecked');
+					$('#'+name+'-i-2').removeClass('checked').addClass('unchecked');
+					$('#'+name+'-i-3').removeClass('checked').addClass('unchecked');
+					$('#'+name+'-i-4').removeClass('checked').addClass('unchecked');
+					$('#'+name+'-i-5').removeClass('checked').addClass('unchecked');
+					
+					for (var i = 1; i <= id; i++) {
+						$('#'+name+'-i-'+i).removeClass('unchecked').addClass('checked');
+					}	
+					
+					for (var i = 1; i <= 5; i++) {
+						$('a[id='+i+']').attr('data-clicked','1');
+					}
+					
+					// save the clicked star value	
+					console.log(name+':'+id);
+					
+					nextTag();
+				}
+								
+			});
+		}
+		
         if (contentFn != "") {
             renderAdditionalContent(contentFn, $('.chat-response:last .add-content')[0]);
         }
@@ -86,7 +146,6 @@ var Chat = (function () {
                     }
                 }
             });
-
 
     };
 
@@ -134,9 +193,9 @@ var Chat = (function () {
             return;
         }
 
-        addResponse(true, curTag["chat-msg"], curTag.content || "", curTag.style || "");
+        addResponse(true, curTag["chat-msg"], curTag.content || "", curTag.style || "", curTag.type || "", curTag.name || "");
 
-        if (curTag.tag && curTag.tag != "text" && curTag.tag != "custom") {
+        if (curTag.tag && curTag.tag != "text" && curTag.tag != "custom" && curTag.tag != "rating") {
             addOptions(curTag.children);
         }
 
